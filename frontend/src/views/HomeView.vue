@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { Bowl, CoffeeCup, Collection, Dish, Search, Star, User } from '@element-plus/icons-vue'
+import { Collection, Dish, Search, Star, User } from '@element-plus/icons-vue'
 import AppShell from '../components/AppShell.vue'
 import ContentImage from '../components/ContentImage.vue'
 import RecipeCard from '../components/RecipeCard.vue'
@@ -17,35 +17,35 @@ const query = ref('')
 
 const entryCards = [
   {
-    title: '汤方专区',
-    subtitle: '靓汤温养，四时皆宜',
-    to: '/soups',
-    variant: 'soup' as const,
-    image: contentImages.entries.soup,
-    icon: Bowl,
-    action: '探索汤方',
-  },
-  {
-    title: '药膳精选',
-    subtitle: '药食搭配，日常可行',
-    to: '/recipes',
+    title: '膳养方案',
+    subtitle: '药膳、汤方、茶饮统一管理',
+    to: '/plans',
     variant: 'recipe' as const,
     image: contentImages.entries.recipe,
     icon: Dish,
-    action: '查看药膳',
+    action: '查看方案',
   },
   {
-    title: '茶方秘典',
-    subtitle: '草本入茶，温润轻养',
-    to: '/teas',
-    variant: 'tea' as const,
-    image: contentImages.entries.tea,
-    icon: CoffeeCup,
-    action: '品味茶方',
+    title: 'AI 个性化推荐',
+    subtitle: '填写健康档案，生成专属药膳建议',
+    to: '/ai',
+    variant: 'hero' as const,
+    image: contentImages.banners.ai,
+    icon: Star,
+    action: '开始定制',
+  },
+  {
+    title: 'AI 药材识别',
+    subtitle: '上传药材图片，辅助识别草本信息',
+    to: '/identify',
+    variant: 'recipe' as const,
+    image: contentImages.herbBasket,
+    icon: Search,
+    action: '上传识别',
   },
 ]
 
-const categoryItems = ['养生', '减脂', '祛火', '祛湿', '安神', '助眠']
+const categoryItems = ['养生', '减脂', '祛火', '祛湿', '安神', '助眠', '补气养血']
 
 function variantFor(recipe: Recipe) {
   if (recipe.type === 'soup') return 'soup'
@@ -64,9 +64,9 @@ onMounted(async () => {
       <section class="home-hero">
         <div class="container home-hero-inner">
           <div class="home-hero-copy">
-            <div class="eyebrow">药食同源 · AI 个性化药膳</div>
+            <div class="eyebrow">膳本云鉴 / HerbWise Cloud</div>
             <h1 class="hero-title">药食同源，智养有方</h1>
-            <p class="hero-subtitle">以中医体质辨识为线索，结合日常饮食偏好，为您推荐温和、可执行、适合展示的药膳养生方案。</p>
+            <p class="hero-subtitle">AI 药食同源个性化调理与健康管理平台。以中医体质辨识为线索，整合膳养方案、药材识别与 AI 推荐能力。</p>
             <div class="search-row hero-search">
               <el-icon><Search /></el-icon>
               <input v-model="query" aria-label="搜索" placeholder="搜索药膳、食材、功效、症状等" />
@@ -106,7 +106,7 @@ onMounted(async () => {
                   <h2 class="section-title">为你推荐</h2>
                   <p class="muted">围绕气血、脾胃、睡眠与轻体管理，挑选更适合日常执行的药膳。</p>
                 </div>
-                <RouterLink class="text-link" to="/recipes">查看更多</RouterLink>
+                <RouterLink class="text-link" to="/plans">查看更多</RouterLink>
               </div>
               <div class="recipe-grid">
                 <RecipeCard v-for="recipe in home.recommended.slice(0, 4)" :key="recipe.id" :recipe="recipe" />
@@ -122,7 +122,7 @@ onMounted(async () => {
               <div class="seasonal-list">
                 <div class="section-head">
                   <h2 class="section-title">当季推荐</h2>
-                  <RouterLink class="text-link" to="/recipes">查看全部</RouterLink>
+                  <RouterLink class="text-link" to="/plans">查看全部</RouterLink>
                 </div>
                 <div class="compact-list">
                   <article v-for="recipe in home.seasonal.slice(0, 3)" :key="recipe.id" class="mini-recipe">
@@ -137,7 +137,7 @@ onMounted(async () => {
                         <span v-for="tag in recipe.tags.slice(0, 2)" :key="tag" class="tag">{{ tag }}</span>
                       </div>
                     </div>
-                    <RouterLink class="mini-action" :to="recipe.type === 'tea' ? '/teas' : recipe.type === 'soup' ? '/soups' : '/recipes'">查看</RouterLink>
+                    <RouterLink class="mini-action" :to="{ path: '/plans', query: { type: recipe.type } }">查看</RouterLink>
                   </article>
                 </div>
               </div>
@@ -149,7 +149,7 @@ onMounted(async () => {
                   <h2 class="section-title">热门推荐分类</h2>
                 </div>
                 <div class="category-grid">
-                  <RouterLink v-for="item in categoryItems" :key="item" class="category-tile" to="/recipes">
+                  <RouterLink v-for="item in categoryItems" :key="item" class="category-tile" :to="{ path: '/plans', query: { category: item } }">
                     <span>{{ item }}</span>
                   </RouterLink>
                 </div>
@@ -203,7 +203,7 @@ onMounted(async () => {
               <span class="avatar">
                 <el-icon><User /></el-icon>
               </span>
-              <h2>{{ auth.user ? `欢迎您，${auth.user.nickname}` : '欢迎来到智膳坊' }}</h2>
+              <h2>{{ auth.user ? `欢迎您，${auth.user.nickname}` : '欢迎来到膳本云鉴' }}</h2>
               <p class="muted">{{ auth.user ? '继续查看您的个性化推荐与收藏' : '登录后可同步收藏、健康档案与 AI 推荐结果' }}</p>
               <RouterLink class="primary-btn block-btn" :to="auth.user ? '/favorites' : '/login'">
                 {{ auth.user ? '查看收藏' : '登录 / 注册' }}

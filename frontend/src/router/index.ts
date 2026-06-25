@@ -1,10 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
-import ListingView from '../views/ListingView.vue'
+import PlansView from '../views/PlansView.vue'
 import AiEntryView from '../views/AiEntryView.vue'
 import AiProfileView from '../views/AiProfileView.vue'
 import AiResultView from '../views/AiResultView.vue'
+import IdentifyView from '../views/IdentifyView.vue'
 import ArticlesView from '../views/ArticlesView.vue'
 import FavoritesView from '../views/FavoritesView.vue'
 
@@ -13,25 +14,21 @@ const router = createRouter({
   routes: [
     { path: '/', name: 'home', component: HomeView, meta: { title: '首页' } },
     { path: '/login', name: 'login', component: LoginView, meta: { title: '登录注册' } },
+    { path: '/plans', name: 'plans', component: PlansView, meta: { title: '膳养方案' } },
     {
       path: '/recipes',
-      name: 'recipes',
-      component: ListingView,
-      meta: { title: '药膳精选', type: 'medicated_food', section: '药膳精选 · 为你推荐' },
+      redirect: { path: '/plans', query: { type: 'medicated_food' } },
     },
     {
       path: '/soups',
-      name: 'soups',
-      component: ListingView,
-      meta: { title: '汤方专区', type: 'soup', section: '汤方专区 · 汤养全家' },
+      redirect: { path: '/plans', query: { type: 'soup' } },
     },
     {
       path: '/teas',
-      name: 'teas',
-      component: ListingView,
-      meta: { title: '茶方秘典 / 中药奶茶', type: 'tea', section: '茶方秘典 · 草本入茶' },
+      redirect: { path: '/plans', query: { type: 'tea' } },
     },
     { path: '/ai', name: 'ai', component: AiEntryView, meta: { title: 'AI 药膳' } },
+    { path: '/identify', name: 'identify', component: IdentifyView, meta: { title: '药材识别' } },
     {
       path: '/ai/profile',
       name: 'ai-profile',

@@ -10,12 +10,11 @@ const menuOpen = ref(false)
 
 const navItems = [
   { path: '/', label: '首页' },
-  { path: '/recipes', label: '药膳精选' },
-  { path: '/soups', label: '汤方专区' },
-  { path: '/teas', label: '茶方秘典 / 中药奶茶' },
+  { path: '/plans', label: '膳养方案' },
   { path: '/ai', label: 'AI 药膳' },
+  { path: '/identify', label: '药材识别' },
   { path: '/articles', label: '养生资讯' },
-  { path: '/favorites', label: '收藏' },
+  { path: '/favorites', label: '我的收藏' },
 ]
 
 const displayName = computed(() => auth.user?.nickname || '登录 / 注册')
@@ -29,13 +28,13 @@ function isActive(path: string) {
 <template>
   <header class="topbar">
     <div class="container topbar-inner">
-      <RouterLink class="brand" to="/" aria-label="智膳坊首页">
+      <RouterLink class="brand" to="/" aria-label="膳本云鉴首页">
         <span class="brand-mark">
           <span class="brand-mark-inner">膳</span>
         </span>
         <span>
-          <span class="brand-title">智膳坊</span>
-          <span class="brand-subtitle">个性化药膳推荐与健康管理平台</span>
+          <span class="brand-title">膳本云鉴</span>
+          <span class="brand-subtitle">AI 药食同源个性化调理与健康管理平台</span>
         </span>
       </RouterLink>
 

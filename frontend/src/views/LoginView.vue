@@ -42,8 +42,8 @@ async function wechatLogin() {
       <RouterLink class="brand login-brand" to="/">
         <span class="brand-mark"><span class="brand-mark-inner">膳</span></span>
         <span>
-          <span class="brand-title">智膳坊</span>
-          <span class="brand-subtitle">个性化药膳推荐与健康管理平台</span>
+          <span class="brand-title">膳本云鉴</span>
+          <span class="brand-subtitle">AI 药食同源个性化调理与健康管理平台</span>
         </span>
       </RouterLink>
 
@@ -85,7 +85,7 @@ async function wechatLogin() {
           <button :class="{ active: mode === 'login' }" type="button" @click="mode = 'login'">登录</button>
           <button :class="{ active: mode === 'register' }" type="button" @click="mode = 'register'">注册</button>
         </div>
-        <p class="muted login-hint">{{ mode === 'login' ? '登录智膳坊，开启您的个性化健康之旅' : '注册账号，建立您的专属健康档案' }}</p>
+        <p class="muted login-hint">{{ mode === 'login' ? '登录膳本云鉴，开启您的个性化健康之旅' : '注册账号，建立您的专属健康档案' }}</p>
 
         <label class="form-line">
           <span>手机号</span>
@@ -113,7 +113,7 @@ async function wechatLogin() {
 
         <button class="primary-btn block-btn big-btn" type="button" :disabled="!agreed" @click="submit">
           <el-icon><User /></el-icon>
-          {{ mode === 'login' ? '登录智膳坊' : '注册并登录' }}
+          {{ mode === 'login' ? '登录膳本云鉴' : '注册并登录' }}
         </button>
 
         <div class="divider"><span>或</span></div>
