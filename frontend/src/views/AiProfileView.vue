@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { Calendar, Check, DocumentChecked, Lock, MagicStick, Warning } from '@element-plus/icons-vue'
 import AppShell from '../components/AppShell.vue'
 import VisualBlock from '../components/VisualBlock.vue'
+import { contentImages } from '../data/imageMap'
 import { api } from '../services/api'
 import type { HealthProfilePayload } from '../types'
 
@@ -56,6 +57,11 @@ async function submit() {
   isSubmitting.value = false
   router.push({ path: '/ai/result', query: { id: result.id } })
 }
+
+function hideBrokenImage(event: Event) {
+  const image = event.target as HTMLImageElement
+  image.hidden = true
+}
 </script>
 
 <template>
@@ -75,6 +81,7 @@ async function submit() {
         <aside class="profile-aside">
           <div class="profile-aside-hero">
             <VisualBlock variant="profile" title="健康问卷" subtitle="AI 药膳档案" />
+            <img class="content-image visual-img" :src="contentImages.herbBasket" alt="草本食材与药膳健康档案" @error="hideBrokenImage" />
           </div>
           <div class="profile-aside-copy">
             <h1>AI 药膳健康问卷</h1>

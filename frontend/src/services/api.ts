@@ -1,5 +1,6 @@
 import axios from 'axios'
 import {
+  decorateArticle,
   decorateRecipe,
   mockArticles,
   mockFavorites,
@@ -50,10 +51,15 @@ export const api = {
         ...res.data,
         recommended: res.data.recommended.map(decorateRecipe),
         seasonal: res.data.seasonal.map(decorateRecipe),
-        articles: res.data.articles.map((article, index) => ({
-          ...article,
-          cover: article.cover || mockArticles[index % mockArticles.length].cover,
-        })),
+        articles: res.data.articles.map((article, index) =>
+          decorateArticle(
+            {
+              ...article,
+              cover: article.cover || mockArticles[index % mockArticles.length].cover,
+            },
+            index,
+          ),
+        ),
       }))
       .catch(() => mockHome)
   },
@@ -71,12 +77,7 @@ export const api = {
   articles() {
     return http
       .get<Article[]>('/articles')
-      .then((res) =>
-        res.data.map((article, index) => ({
-          ...article,
-          cover: article.cover || mockArticles[index % mockArticles.length].cover,
-        })),
-      )
+      .then((res) => res.data.map((article, index) => decorateArticle(article, index)))
       .catch(() => mockArticles)
   },
   favorites() {

@@ -3,13 +3,13 @@ import { computed, onMounted, ref } from 'vue'
 import { Bowl, Collection, CoffeeCup, Delete, Dish, Reading } from '@element-plus/icons-vue'
 import AppShell from '../components/AppShell.vue'
 import VisualBlock from '../components/VisualBlock.vue'
+import { contentImages } from '../data/imageMap'
 import { useFavoriteStore } from '../stores/favorites'
 import type { Favorite } from '../types'
 
 const favorites = useFavoriteStore()
-const active = ref('全部')
+const active = ref('recipe')
 const tabs = [
-  { label: '全部', value: '全部', icon: Collection },
   { label: '药膳方案', value: 'recipe', icon: Dish },
   { label: '汤方', value: 'soup', icon: Bowl },
   { label: '茶方', value: 'tea', icon: CoffeeCup },
@@ -21,7 +21,6 @@ onMounted(() => {
 })
 
 const visibleItems = computed(() => {
-  if (active.value === '全部') return favorites.items
   if (active.value === 'recipe') {
     return favorites.items.filter((item) => item.targetType === 'recipe' || item.targetType === 'recommendation')
   }
@@ -45,6 +44,26 @@ function typeLabel(type: string) {
     article: '养生资讯',
   }[type] || '收藏'
 }
+
+function imageFor(item: Favorite) {
+  if (item.targetType === 'article') {
+    return favorites.articleForFavorite(item)?.cover || contentImages.articles.default
+  }
+  if (item.targetType === 'recommendation') {
+    return contentImages.recipes['当归黄芪乌鸡汤']
+  }
+
+  const recipe = favorites.recipeForFavorite(item)
+  if (recipe?.imageUrl) return recipe.imageUrl
+  if (item.targetType === 'soup') return contentImages.entries.soup
+  if (item.targetType === 'tea') return contentImages.entries.tea
+  return contentImages.entries.recipe
+}
+
+function hideBrokenImage(event: Event) {
+  const image = event.target as HTMLImageElement
+  image.hidden = true
+}
 </script>
 
 <template>
@@ -58,6 +77,7 @@ function typeLabel(type: string) {
         </div>
         <div class="listing-hero-image">
           <VisualBlock variant="herb" title="我的养生册" subtitle="Saved Plans" />
+          <img class="banner-real-image visual-img" :src="contentImages.herbBasket" alt="草本药材与养生食材" @error="hideBrokenImage" />
         </div>
       </section>
 
@@ -73,6 +93,7 @@ function typeLabel(type: string) {
           <article v-for="item in visibleItems" :key="item.id" class="favorite-item">
             <div class="favorite-visual">
               <VisualBlock :variant="variantFor(item)" :title="typeLabel(item.targetType)" compact />
+              <img class="content-image visual-img" :src="imageFor(item)" :alt="item.title" @error="hideBrokenImage" />
             </div>
             <div>
               <span class="tag">{{ typeLabel(item.targetType) }}</span>

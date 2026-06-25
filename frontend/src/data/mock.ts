@@ -7,42 +7,48 @@ import type {
   RecommendationResult,
   UserProfile,
 } from '../types'
-
-export const imageMap: Record<string, string> = {
-  hero: '/images/hero-banquet.jpg',
-  login: '/images/login-soup-table.jpg',
-  herbBasket: '/images/herb-basket.jpg',
-  result: '/images/result-chicken-soup.jpg',
-  soupEntry: '/images/soup-entry.jpg',
-  recipeEntry: '/images/recipe-entry.jpg',
-  teaEntry: '/images/tea-entry.jpg',
-}
+import { contentImages, safeContentImage } from './imageMap'
 
 const recipeImageByName: Record<string, string> = {
-  当归黄芪乌鸡汤: '/images/soup-chicken.jpg',
-  黄芪党参乌鸡汤: '/images/result-chicken-soup.jpg',
-  四物汤: '/images/brown-herb-soup.jpg',
-  桂枝汤: '/images/tea-clear.jpg',
-  麻黄汤: '/images/cassia-tea.jpg',
-  茯苓山药排骨汤: '/images/porridge-green.jpg',
-  莲子百合银耳羹: '/images/sweet-soup.jpg',
-  玫瑰红枣奶茶: '/images/rose-tea.jpg',
-  桂圆枸杞茶: '/images/chenpi-tea.jpg',
-  陈皮普洱茶: '/images/chenpi-tea.jpg',
-  茯苓安神奶茶: '/images/tea-clear.jpg',
-  冬瓜薏米汤: '/images/porridge-green.jpg',
+  当归黄芪乌鸡汤: contentImages.recipes['当归黄芪乌鸡汤'],
+  黄芪党参乌鸡汤: contentImages.recipes['黄芪党参乌鸡汤'],
+  四物汤: contentImages.recipes['四物汤'],
+  桂枝汤: contentImages.recipes['桂枝汤'],
+  麻黄汤: contentImages.recipes['麻黄汤'],
+  茯苓山药排骨汤: contentImages.recipes['茯苓山药排骨汤'],
+  莲子百合银耳羹: contentImages.recipes['莲子百合银耳羹'],
+  玫瑰红枣奶茶: contentImages.recipes['玫瑰红枣奶茶'],
+  桂圆枸杞茶: contentImages.recipes['桂圆枸杞茶'],
+  陈皮普洱茶: contentImages.recipes['陈皮普洱茶'],
+  茯苓安神奶茶: contentImages.recipes['茯苓安神奶茶'],
+  冬瓜薏米汤: contentImages.recipes['冬瓜薏米汤'],
 }
 
 const typeFallbackImage: Record<RecipeType, string> = {
-  medicated_food: '/images/sweet-soup.jpg',
-  soup: '/images/soup-chicken.jpg',
-  tea: '/images/rose-tea.jpg',
+  medicated_food: contentImages.entries.recipe,
+  soup: contentImages.entries.soup,
+  tea: contentImages.entries.tea,
 }
 
 export function decorateRecipe(recipe: Recipe): Recipe {
+  const fallback = recipeImageByName[recipe.name] || typeFallbackImage[recipe.type] || contentImages.entries.recipe
   return {
     ...recipe,
-    imageUrl: recipe.imageUrl || recipeImageByName[recipe.name] || typeFallbackImage[recipe.type],
+    imageUrl: safeContentImage(recipe.imageUrl, fallback),
+  }
+}
+
+export function decorateArticle(article: Article, index = 0): Article {
+  const fallbackImages = [
+    contentImages.articles.season,
+    contentImages.articles.diet,
+    contentImages.articles.soup,
+    contentImages.articles.default,
+  ]
+
+  return {
+    ...article,
+    cover: safeContentImage(article.cover, fallbackImages[index % fallbackImages.length] || contentImages.articles.default),
   }
 }
 
@@ -231,7 +237,7 @@ export const mockArticles: Article[] = [
     id: 1,
     title: '立夏养心正当时：中医教你顺时养生',
     category: '节气养生',
-    cover: '/images/tea-clear.jpg',
+    cover: contentImages.articles.season,
     summary: '立夏后天气渐热，养心、清补、安眠是这一季的关键词。',
     views: 1243,
     createdAt: '2026-06-01T08:00:00',
@@ -240,7 +246,7 @@ export const mockArticles: Article[] = [
     id: 2,
     title: '湿气重的表现与日常调理方法',
     category: '调理方法',
-    cover: '/images/chenpi-tea.jpg',
+    cover: contentImages.articles.diet,
     summary: '从舌苔、困倦、胃口和体感判断湿气，并用饮食慢慢调理。',
     views: 892,
     createdAt: '2026-06-04T08:00:00',
@@ -249,7 +255,7 @@ export const mockArticles: Article[] = [
     id: 3,
     title: '一碗好汤，胜过良方：汤方的智慧',
     category: '药膳食疗',
-    cover: '/images/soup-chicken.jpg',
+    cover: contentImages.articles.soup,
     summary: '汤方讲究因时、因人、因体质，日常食疗也能有章法。',
     views: 1560,
     createdAt: '2026-06-08T08:00:00',
@@ -258,7 +264,7 @@ export const mockArticles: Article[] = [
     id: 4,
     title: '夏季上火别急补，清润茶饮这样搭',
     category: '养生指南',
-    cover: '/images/rose-tea.jpg',
+    cover: contentImages.articles.default,
     summary: '玫瑰、陈皮、百合等草本茶饮如何搭配才更温和。',
     views: 1028,
     createdAt: '2026-06-13T08:00:00',

@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Cellphone, ChatDotRound, Collection, Document, Lock, User } from '@element-plus/icons-vue'
 import VisualBlock from '../components/VisualBlock.vue'
+import { contentImages } from '../data/imageMap'
 import { api } from '../services/api'
 import { useAuthStore } from '../stores/auth'
 
@@ -30,6 +31,11 @@ async function guest() {
 async function wechatLogin() {
   auth.user = await api.login({ phone: phone.value || '13800000000', code: code.value || '123456' })
   router.push('/')
+}
+
+function hideBrokenImage(event: Event) {
+  const image = event.target as HTMLImageElement
+  image.hidden = true
 }
 </script>
 
@@ -70,6 +76,7 @@ async function wechatLogin() {
 
       <div class="login-photo">
         <VisualBlock variant="hero" title="温润药膳" subtitle="Herbal Cuisine" />
+        <img class="hero-real-image visual-img" :src="contentImages.login" alt="中式药膳汤品餐桌" @error="hideBrokenImage" />
       </div>
     </section>
 

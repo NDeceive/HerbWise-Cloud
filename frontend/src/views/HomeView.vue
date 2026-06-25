@@ -4,6 +4,7 @@ import { Bowl, CoffeeCup, Collection, Dish, Search, Star, User } from '@element-
 import AppShell from '../components/AppShell.vue'
 import RecipeCard from '../components/RecipeCard.vue'
 import VisualBlock from '../components/VisualBlock.vue'
+import { contentImages } from '../data/imageMap'
 import { mockHome } from '../data/mock'
 import { api } from '../services/api'
 import { useAuthStore } from '../stores/auth'
@@ -19,6 +20,7 @@ const entryCards = [
     subtitle: '靓汤温养，四时皆宜',
     to: '/soups',
     variant: 'soup' as const,
+    image: contentImages.entries.soup,
     icon: Bowl,
     action: '探索汤方',
   },
@@ -27,6 +29,7 @@ const entryCards = [
     subtitle: '药食搭配，日常可行',
     to: '/recipes',
     variant: 'recipe' as const,
+    image: contentImages.entries.recipe,
     icon: Dish,
     action: '查看药膳',
   },
@@ -35,6 +38,7 @@ const entryCards = [
     subtitle: '草本入茶，温润轻养',
     to: '/teas',
     variant: 'tea' as const,
+    image: contentImages.entries.tea,
     icon: CoffeeCup,
     action: '品味茶方',
   },
@@ -46,6 +50,11 @@ function variantFor(recipe: Recipe) {
   if (recipe.type === 'soup') return 'soup'
   if (recipe.type === 'tea') return 'tea'
   return 'recipe'
+}
+
+function hideBrokenImage(event: Event) {
+  const image = event.target as HTMLImageElement
+  image.hidden = true
 }
 
 onMounted(async () => {
@@ -70,6 +79,7 @@ onMounted(async () => {
           </div>
           <div class="hero-image-card">
             <VisualBlock variant="hero" title="草本膳养" subtitle="Herbal Cuisine" />
+            <img class="hero-real-image visual-img" :src="contentImages.hero" alt="中式药膳宴席与草本食材" @error="hideBrokenImage" />
           </div>
         </div>
       </section>
@@ -78,7 +88,11 @@ onMounted(async () => {
         <section class="entry-grid">
           <RouterLink v-for="card in entryCards" :key="card.title" class="entry-card" :to="card.to">
             <VisualBlock :variant="card.variant" :title="card.title" :subtitle="card.subtitle" />
+            <img class="entry-bg-image visual-img" :src="card.image" :alt="card.title" @error="hideBrokenImage" />
             <span class="entry-content">
+              <span class="entry-icon">
+                <component :is="card.icon" />
+              </span>
               <strong>{{ card.title }}</strong>
               <small>{{ card.subtitle }}</small>
               <em>{{ card.action }}</em>
@@ -116,6 +130,7 @@ onMounted(async () => {
                   <article v-for="recipe in home.seasonal.slice(0, 3)" :key="recipe.id" class="mini-recipe">
                     <div class="mini-visual">
                       <VisualBlock :variant="variantFor(recipe)" :title="recipe.name" compact />
+                      <img v-if="recipe.imageUrl" class="content-image visual-img" :src="recipe.imageUrl" :alt="recipe.name" @error="hideBrokenImage" />
                     </div>
                     <div>
                       <strong>{{ recipe.name }}</strong>
@@ -150,6 +165,7 @@ onMounted(async () => {
                   <article v-for="article in home.articles.slice(0, 4)" :key="article.id" class="article-mini">
                     <div class="mini-visual">
                       <VisualBlock variant="article" :title="article.category" compact />
+                      <img v-if="article.cover" class="content-image visual-img" :src="article.cover" :alt="article.title" @error="hideBrokenImage" />
                     </div>
                     <div>
                       <strong>{{ article.title }}</strong>

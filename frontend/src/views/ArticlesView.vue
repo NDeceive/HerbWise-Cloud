@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { Collection, Reading, Search } from '@element-plus/icons-vue'
 import AppShell from '../components/AppShell.vue'
 import VisualBlock from '../components/VisualBlock.vue'
+import { contentImages } from '../data/imageMap'
 import { mockArticles } from '../data/mock'
 import { api } from '../services/api'
 import { useFavoriteStore } from '../stores/favorites'
@@ -20,6 +21,11 @@ const filtered = computed(() =>
 onMounted(async () => {
   articles.value = await api.articles()
 })
+
+function hideBrokenImage(event: Event) {
+  const image = event.target as HTMLImageElement
+  image.hidden = true
+}
 </script>
 
 <template>
@@ -37,6 +43,7 @@ onMounted(async () => {
         </div>
         <div class="listing-hero-image">
           <VisualBlock variant="article" title="四时养生" subtitle="Wellness Notes" />
+          <img class="banner-real-image visual-img" :src="contentImages.banners.articles" alt="草本养生与四时食材" @error="hideBrokenImage" />
         </div>
       </section>
 
@@ -60,6 +67,7 @@ onMounted(async () => {
           <article v-for="article in filtered" :key="article.id" class="article-card">
             <div class="article-visual">
               <VisualBlock variant="article" :title="article.category" compact />
+              <img v-if="article.cover" class="content-image visual-img" :src="article.cover" :alt="article.title" @error="hideBrokenImage" />
             </div>
             <div class="article-body">
               <span class="tag">{{ article.category }}</span>

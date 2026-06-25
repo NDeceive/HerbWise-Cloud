@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ChatDotRound, Collection, FirstAidKit, Refresh, Share, Warning } from '@element-plus/icons-vue'
 import AppShell from '../components/AppShell.vue'
 import VisualBlock from '../components/VisualBlock.vue'
-import { mockRecommendation } from '../data/mock'
+import { contentImages } from '../data/imageMap'
+import { mockRecommendation, mockRecipes } from '../data/mock'
 import { api } from '../services/api'
 import { useFavoriteStore } from '../stores/favorites'
 import type { Recipe, RecommendationResult } from '../types'
@@ -15,6 +16,11 @@ const favorites = useFavoriteStore()
 const result = ref<RecommendationResult>(mockRecommendation)
 const saved = ref(false)
 const saving = ref(false)
+const resultImage = computed(() =>
+  mockRecipes.find((recipe) => recipe.name === result.value.recipeName)?.imageUrl
+  || contentImages.recipes[result.value.recipeName]
+  || contentImages.recipes['当归黄芪乌鸡汤'],
+)
 
 const basicInfo = [
   ['功效', '补气养血、健脾益气、增强免疫'],
@@ -29,6 +35,11 @@ function variantFor(recipe: Recipe) {
   if (recipe.type === 'soup') return 'soup'
   if (recipe.type === 'tea') return 'tea'
   return 'recipe'
+}
+
+function hideBrokenImage(event: Event) {
+  const image = event.target as HTMLImageElement
+  image.hidden = true
 }
 
 onMounted(async () => {
@@ -54,6 +65,7 @@ async function saveResult() {
       <section class="result-main-card">
         <div class="result-visual">
           <VisualBlock variant="result" :title="result.recipeName" subtitle="本次主推荐" />
+          <img class="hero-real-image visual-img" :src="resultImage" :alt="result.recipeName" @error="hideBrokenImage" />
         </div>
         <div class="result-main-copy">
           <div class="eyebrow">本次为您推荐</div>
@@ -111,6 +123,7 @@ async function saveResult() {
             </div>
             <div class="cooking-visual">
               <VisualBlock variant="soup" title="温火慢炖" compact />
+              <img class="content-image visual-img" :src="resultImage" :alt="`${result.recipeName}烹饪示意`" @error="hideBrokenImage" />
             </div>
           </section>
 
@@ -147,6 +160,7 @@ async function saveResult() {
               <article v-for="recipe in result.relatedRecipes" :key="recipe.id" class="mini-recipe side-mini">
                 <div class="mini-visual">
                   <VisualBlock :variant="variantFor(recipe)" :title="recipe.name" compact />
+                  <img v-if="recipe.imageUrl" class="content-image visual-img" :src="recipe.imageUrl" :alt="recipe.name" @error="hideBrokenImage" />
                 </div>
                 <div>
                   <strong>{{ recipe.name }}</strong>
@@ -167,6 +181,7 @@ async function saveResult() {
               <article v-for="recipe in result.teaPairings" :key="recipe.id" class="mini-recipe side-mini">
                 <div class="mini-visual">
                   <VisualBlock variant="tea" :title="recipe.name" compact />
+                  <img v-if="recipe.imageUrl" class="content-image visual-img" :src="recipe.imageUrl" :alt="recipe.name" @error="hideBrokenImage" />
                 </div>
                 <div>
                   <strong>{{ recipe.name }}</strong>

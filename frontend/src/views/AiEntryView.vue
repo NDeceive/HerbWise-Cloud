@@ -2,6 +2,7 @@
 import { Collection, DocumentChecked, FirstAidKit, MagicStick, Warning } from '@element-plus/icons-vue'
 import AppShell from '../components/AppShell.vue'
 import VisualBlock from '../components/VisualBlock.vue'
+import { contentImages } from '../data/imageMap'
 
 const flow = [
   { title: '填写健康档案', text: '录入基本信息、体质症状、饮食习惯。', icon: DocumentChecked },
@@ -9,6 +10,18 @@ const flow = [
   { title: '生成药膳方案', text: '输出推荐理由、配方、做法与忌口建议。', icon: FirstAidKit },
   { title: '收藏/分享/咨询', text: '保存方案，后续查看或咨询专业医师。', icon: Collection },
 ]
+
+const sampleRecommendation = {
+  title: '当归黄芪乌鸡汤',
+  image: contentImages.recipes['当归黄芪乌鸡汤'],
+  tags: ['温补', '健脾', '补气养血'],
+  reason: '适合气虚、疲劳乏力、气血不足人群的温和调理。',
+}
+
+function hideBrokenImage(event: Event) {
+  const image = event.target as HTMLImageElement
+  image.hidden = true
+}
 </script>
 
 <template>
@@ -17,6 +30,7 @@ const flow = [
       <section class="ai-entry-hero">
         <div class="ai-entry-image">
           <VisualBlock variant="profile" title="体质辨识" subtitle="AI Herbal Plan" />
+          <img class="banner-real-image visual-img" :src="contentImages.banners.ai" alt="中式草本药材与药膳食材" @error="hideBrokenImage" />
         </div>
         <div class="ai-entry-copy">
           <div class="eyebrow">AI 药膳 · 个性化定制</div>
@@ -43,6 +57,34 @@ const flow = [
             <p>{{ item.text }}</p>
           </article>
         </div>
+      </section>
+
+      <section class="section-card ai-preview-section">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">推荐示例</h2>
+            <p class="muted">从体质画像出发，给出可执行的药膳、适配理由与日常提醒。</p>
+          </div>
+        </div>
+        <article class="sample-recommendation">
+          <div class="sample-image">
+            <VisualBlock variant="soup" :title="sampleRecommendation.title" compact />
+            <img
+              class="content-image visual-img"
+              :src="sampleRecommendation.image"
+              :alt="sampleRecommendation.title"
+              @error="hideBrokenImage"
+            />
+          </div>
+          <div class="sample-copy">
+            <span class="tag">推荐示例</span>
+            <h3>{{ sampleRecommendation.title }}</h3>
+            <div class="tags">
+              <span v-for="tag in sampleRecommendation.tags" :key="tag" class="tag">{{ tag }}</span>
+            </div>
+            <p>{{ sampleRecommendation.reason }}</p>
+          </div>
+        </article>
       </section>
 
       <section class="notice-card">

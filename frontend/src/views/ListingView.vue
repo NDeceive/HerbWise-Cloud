@@ -5,6 +5,7 @@ import { Bowl, CoffeeCup, Collection, Dish, Filter, MagicStick, PriceTag } from 
 import AppShell from '../components/AppShell.vue'
 import RecipeCard from '../components/RecipeCard.vue'
 import VisualBlock from '../components/VisualBlock.vue'
+import { contentImages } from '../data/imageMap'
 import { api } from '../services/api'
 import type { Recipe, RecipeType } from '../types'
 
@@ -22,6 +23,7 @@ const pageMeta = computed(() => {
       title: '汤方专区 · 汤养全家',
       subtitle: '从经典汤方到当季滋补，按体质、季节与功效找到适合的一碗汤。',
       variant: 'soup' as const,
+      image: contentImages.banners.soups,
       icon: Bowl,
       popularTitle: '人气汤品',
     }
@@ -32,6 +34,7 @@ const pageMeta = computed(() => {
       title: '茶方秘典 · 草本入茶',
       subtitle: '精选草本茶饮与中药奶茶，兼顾口味、调理目标与日常轻养生。',
       variant: 'tea' as const,
+      image: contentImages.banners.teas,
       icon: CoffeeCup,
       popularTitle: '人气茶饮',
     }
@@ -41,6 +44,7 @@ const pageMeta = computed(() => {
     title: '药膳精选 · 为你推荐',
     subtitle: '分类展示食膳配方，置顶个性化推荐，适合比赛展示的内容门户。',
     variant: 'recipe' as const,
+    image: contentImages.banners.recipes,
     icon: Dish,
     popularTitle: '人气推荐',
   }
@@ -54,6 +58,11 @@ function variantFor(recipe: Recipe) {
   if (recipe.type === 'soup') return 'soup'
   if (recipe.type === 'tea') return 'tea'
   return 'recipe'
+}
+
+function hideBrokenImage(event: Event) {
+  const image = event.target as HTMLImageElement
+  image.hidden = true
 }
 
 async function load() {
@@ -95,6 +104,7 @@ watch(category, load)
         </div>
         <div class="listing-hero-image">
           <VisualBlock :variant="pageMeta.variant" :title="pageMeta.eyebrow" subtitle="Herbal Wellness" />
+          <img class="banner-real-image visual-img" :src="pageMeta.image" :alt="pageMeta.title" @error="hideBrokenImage" />
         </div>
       </section>
 
@@ -134,6 +144,7 @@ watch(category, load)
               <article v-for="recipe in seasonalRecipes" :key="recipe.id" class="landscape-card">
                 <div class="landscape-visual">
                   <VisualBlock :variant="variantFor(recipe)" :title="recipe.name" compact />
+                  <img v-if="recipe.imageUrl" class="content-image visual-img" :src="recipe.imageUrl" :alt="recipe.name" @error="hideBrokenImage" />
                 </div>
                 <div>
                   <h3>{{ recipe.name }}</h3>
@@ -180,6 +191,7 @@ watch(category, load)
               <article v-for="recipe in recipes.slice(0, 3)" :key="`side-${recipe.id}`" class="mini-recipe side-mini">
                 <div class="mini-visual">
                   <VisualBlock :variant="variantFor(recipe)" :title="recipe.name" compact />
+                  <img v-if="recipe.imageUrl" class="content-image visual-img" :src="recipe.imageUrl" :alt="recipe.name" @error="hideBrokenImage" />
                 </div>
                 <div>
                   <strong>{{ recipe.name }}</strong>
