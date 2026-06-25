@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ChatDotRound, Collection, FirstAidKit, Refresh, Share, Warning } from '@element-plus/icons-vue'
 import AppShell from '../components/AppShell.vue'
+import ContentImage from '../components/ContentImage.vue'
 import VisualBlock from '../components/VisualBlock.vue'
 import { contentImages } from '../data/imageMap'
 import { mockRecommendation, mockRecipes } from '../data/mock'
@@ -37,11 +38,6 @@ function variantFor(recipe: Recipe) {
   return 'recipe'
 }
 
-function hideBrokenImage(event: Event) {
-  const image = event.target as HTMLImageElement
-  image.hidden = true
-}
-
 onMounted(async () => {
   result.value = await api.recommendation(String(route.query.id ?? 1001))
   await favorites.load()
@@ -64,8 +60,9 @@ async function saveResult() {
 
       <section class="result-main-card">
         <div class="result-visual">
-          <VisualBlock variant="result" :title="result.recipeName" subtitle="本次主推荐" />
-          <img class="hero-real-image visual-img" :src="resultImage" :alt="result.recipeName" @error="hideBrokenImage" />
+          <ContentImage :src="resultImage" :alt="result.recipeName" image-class="hero-real-image visual-img">
+            <VisualBlock variant="result" :title="result.recipeName" subtitle="本次主推荐" />
+          </ContentImage>
         </div>
         <div class="result-main-copy">
           <div class="eyebrow">本次为您推荐</div>
@@ -122,8 +119,9 @@ async function saveResult() {
               </ol>
             </div>
             <div class="cooking-visual">
-              <VisualBlock variant="soup" title="温火慢炖" compact />
-              <img class="content-image visual-img" :src="resultImage" :alt="`${result.recipeName}烹饪示意`" @error="hideBrokenImage" />
+              <ContentImage :src="resultImage" :alt="`${result.recipeName}烹饪示意`">
+                <VisualBlock variant="soup" title="温火慢炖" compact />
+              </ContentImage>
             </div>
           </section>
 
@@ -159,8 +157,9 @@ async function saveResult() {
             <div class="compact-list">
               <article v-for="recipe in result.relatedRecipes" :key="recipe.id" class="mini-recipe side-mini">
                 <div class="mini-visual">
-                  <VisualBlock :variant="variantFor(recipe)" :title="recipe.name" compact />
-                  <img v-if="recipe.imageUrl" class="content-image visual-img" :src="recipe.imageUrl" :alt="recipe.name" @error="hideBrokenImage" />
+                  <ContentImage :src="recipe.imageUrl" :alt="recipe.name">
+                    <VisualBlock :variant="variantFor(recipe)" :title="recipe.name" compact />
+                  </ContentImage>
                 </div>
                 <div>
                   <strong>{{ recipe.name }}</strong>
@@ -180,8 +179,9 @@ async function saveResult() {
             <div class="compact-list">
               <article v-for="recipe in result.teaPairings" :key="recipe.id" class="mini-recipe side-mini">
                 <div class="mini-visual">
-                  <VisualBlock variant="tea" :title="recipe.name" compact />
-                  <img v-if="recipe.imageUrl" class="content-image visual-img" :src="recipe.imageUrl" :alt="recipe.name" @error="hideBrokenImage" />
+                  <ContentImage :src="recipe.imageUrl" :alt="recipe.name">
+                    <VisualBlock variant="tea" :title="recipe.name" compact />
+                  </ContentImage>
                 </div>
                 <div>
                   <strong>{{ recipe.name }}</strong>

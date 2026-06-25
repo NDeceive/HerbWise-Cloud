@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { Bowl, Collection, CoffeeCup, Delete, Dish, Reading } from '@element-plus/icons-vue'
 import AppShell from '../components/AppShell.vue'
+import ContentImage from '../components/ContentImage.vue'
 import VisualBlock from '../components/VisualBlock.vue'
 import { contentImages } from '../data/imageMap'
 import { useFavoriteStore } from '../stores/favorites'
@@ -60,10 +61,6 @@ function imageFor(item: Favorite) {
   return contentImages.entries.recipe
 }
 
-function hideBrokenImage(event: Event) {
-  const image = event.target as HTMLImageElement
-  image.hidden = true
-}
 </script>
 
 <template>
@@ -76,8 +73,9 @@ function hideBrokenImage(event: Event) {
           <p>把偶然发现的良方、茶饮和养生文章妥善保存，后续可一键查看与取消收藏。</p>
         </div>
         <div class="listing-hero-image">
-          <VisualBlock variant="herb" title="我的养生册" subtitle="Saved Plans" />
-          <img class="banner-real-image visual-img" :src="contentImages.herbBasket" alt="草本药材与养生食材" @error="hideBrokenImage" />
+          <ContentImage :src="contentImages.herbBasket" alt="草本药材与养生食材" image-class="banner-real-image visual-img">
+            <VisualBlock variant="herb" title="我的养生册" subtitle="Saved Plans" />
+          </ContentImage>
         </div>
       </section>
 
@@ -92,8 +90,9 @@ function hideBrokenImage(event: Event) {
         <div v-if="visibleItems.length" class="favorite-list">
           <article v-for="item in visibleItems" :key="item.id" class="favorite-item">
             <div class="favorite-visual">
-              <VisualBlock :variant="variantFor(item)" :title="typeLabel(item.targetType)" compact />
-              <img class="content-image visual-img" :src="imageFor(item)" :alt="item.title" @error="hideBrokenImage" />
+              <ContentImage :src="imageFor(item)" :alt="item.title">
+                <VisualBlock :variant="variantFor(item)" :title="typeLabel(item.targetType)" compact />
+              </ContentImage>
             </div>
             <div>
               <span class="tag">{{ typeLabel(item.targetType) }}</span>

@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Cellphone, ChatDotRound, Collection, Document, Lock, User } from '@element-plus/icons-vue'
+import ContentImage from '../components/ContentImage.vue'
 import VisualBlock from '../components/VisualBlock.vue'
 import { contentImages } from '../data/imageMap'
 import { api } from '../services/api'
@@ -33,10 +34,6 @@ async function wechatLogin() {
   router.push('/')
 }
 
-function hideBrokenImage(event: Event) {
-  const image = event.target as HTMLImageElement
-  image.hidden = true
-}
 </script>
 
 <template>
@@ -75,8 +72,9 @@ function hideBrokenImage(event: Event) {
       </div>
 
       <div class="login-photo">
-        <VisualBlock variant="hero" title="温润药膳" subtitle="Herbal Cuisine" />
-        <img class="hero-real-image visual-img" :src="contentImages.login" alt="中式药膳汤品餐桌" @error="hideBrokenImage" />
+        <ContentImage :src="contentImages.login" alt="中式药膳汤品餐桌" image-class="hero-real-image visual-img">
+          <VisualBlock variant="hero" title="温润药膳" subtitle="Herbal Cuisine" />
+        </ContentImage>
       </div>
     </section>
 

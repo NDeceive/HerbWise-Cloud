@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Collection, DocumentChecked, FirstAidKit, MagicStick, Warning } from '@element-plus/icons-vue'
 import AppShell from '../components/AppShell.vue'
+import ContentImage from '../components/ContentImage.vue'
 import VisualBlock from '../components/VisualBlock.vue'
 import { contentImages } from '../data/imageMap'
 
@@ -18,10 +19,6 @@ const sampleRecommendation = {
   reason: '适合气虚、疲劳乏力、气血不足人群的温和调理。',
 }
 
-function hideBrokenImage(event: Event) {
-  const image = event.target as HTMLImageElement
-  image.hidden = true
-}
 </script>
 
 <template>
@@ -29,8 +26,9 @@ function hideBrokenImage(event: Event) {
     <div class="container ai-entry-page">
       <section class="ai-entry-hero">
         <div class="ai-entry-image">
-          <VisualBlock variant="profile" title="体质辨识" subtitle="AI Herbal Plan" />
-          <img class="banner-real-image visual-img" :src="contentImages.banners.ai" alt="中式草本药材与药膳食材" @error="hideBrokenImage" />
+          <ContentImage :src="contentImages.banners.ai" alt="中式草本药材与药膳食材" image-class="banner-real-image visual-img">
+            <VisualBlock variant="profile" title="体质辨识" subtitle="AI Herbal Plan" />
+          </ContentImage>
         </div>
         <div class="ai-entry-copy">
           <div class="eyebrow">AI 药膳 · 个性化定制</div>
@@ -68,13 +66,9 @@ function hideBrokenImage(event: Event) {
         </div>
         <article class="sample-recommendation">
           <div class="sample-image">
-            <VisualBlock variant="soup" :title="sampleRecommendation.title" compact />
-            <img
-              class="content-image visual-img"
-              :src="sampleRecommendation.image"
-              :alt="sampleRecommendation.title"
-              @error="hideBrokenImage"
-            />
+            <ContentImage :src="sampleRecommendation.image" :alt="sampleRecommendation.title">
+              <VisualBlock variant="soup" :title="sampleRecommendation.title" compact />
+            </ContentImage>
           </div>
           <div class="sample-copy">
             <span class="tag">推荐示例</span>

@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { Bowl, CoffeeCup, Collection, Dish, Search, Star, User } from '@element-plus/icons-vue'
 import AppShell from '../components/AppShell.vue'
+import ContentImage from '../components/ContentImage.vue'
 import RecipeCard from '../components/RecipeCard.vue'
 import VisualBlock from '../components/VisualBlock.vue'
 import { contentImages } from '../data/imageMap'
@@ -52,11 +53,6 @@ function variantFor(recipe: Recipe) {
   return 'recipe'
 }
 
-function hideBrokenImage(event: Event) {
-  const image = event.target as HTMLImageElement
-  image.hidden = true
-}
-
 onMounted(async () => {
   home.value = await api.home()
 })
@@ -78,8 +74,9 @@ onMounted(async () => {
             </div>
           </div>
           <div class="hero-image-card">
-            <VisualBlock variant="hero" title="草本膳养" subtitle="Herbal Cuisine" />
-            <img class="hero-real-image visual-img" :src="contentImages.hero" alt="中式药膳宴席与草本食材" @error="hideBrokenImage" />
+            <ContentImage :src="contentImages.hero" alt="中式药膳宴席与草本食材" image-class="hero-real-image visual-img">
+              <VisualBlock variant="hero" title="草本膳养" subtitle="Herbal Cuisine" />
+            </ContentImage>
           </div>
         </div>
       </section>
@@ -87,8 +84,9 @@ onMounted(async () => {
       <div class="container">
         <section class="entry-grid">
           <RouterLink v-for="card in entryCards" :key="card.title" class="entry-card" :to="card.to">
-            <VisualBlock :variant="card.variant" :title="card.title" :subtitle="card.subtitle" />
-            <img class="entry-bg-image visual-img" :src="card.image" :alt="card.title" @error="hideBrokenImage" />
+            <ContentImage :src="card.image" :alt="card.title" image-class="entry-bg-image visual-img">
+              <VisualBlock :variant="card.variant" :title="card.title" :subtitle="card.subtitle" />
+            </ContentImage>
             <span class="entry-content">
               <span class="entry-icon">
                 <component :is="card.icon" />
@@ -129,8 +127,9 @@ onMounted(async () => {
                 <div class="compact-list">
                   <article v-for="recipe in home.seasonal.slice(0, 3)" :key="recipe.id" class="mini-recipe">
                     <div class="mini-visual">
-                      <VisualBlock :variant="variantFor(recipe)" :title="recipe.name" compact />
-                      <img v-if="recipe.imageUrl" class="content-image visual-img" :src="recipe.imageUrl" :alt="recipe.name" @error="hideBrokenImage" />
+                      <ContentImage :src="recipe.imageUrl" :alt="recipe.name">
+                        <VisualBlock :variant="variantFor(recipe)" :title="recipe.name" compact />
+                      </ContentImage>
                     </div>
                     <div>
                       <strong>{{ recipe.name }}</strong>
@@ -164,8 +163,9 @@ onMounted(async () => {
                 <div class="article-strip">
                   <article v-for="article in home.articles.slice(0, 4)" :key="article.id" class="article-mini">
                     <div class="mini-visual">
-                      <VisualBlock variant="article" :title="article.category" compact />
-                      <img v-if="article.cover" class="content-image visual-img" :src="article.cover" :alt="article.title" @error="hideBrokenImage" />
+                      <ContentImage :src="article.cover" :alt="article.title">
+                        <VisualBlock variant="article" :title="article.category" compact />
+                      </ContentImage>
                     </div>
                     <div>
                       <strong>{{ article.title }}</strong>
