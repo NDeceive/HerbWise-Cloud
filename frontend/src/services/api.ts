@@ -13,6 +13,9 @@ import type {
   Article,
   Favorite,
   HealthProfilePayload,
+  HerbIdentifyDetailResponse,
+  HerbIdentifyRecordResponse,
+  HerbIdentifyResponse,
   HomeData,
   Recipe,
   RecipeType,
@@ -124,5 +127,16 @@ export const api = {
         teaPairings: res.data.teaPairings.map(decorateRecipe),
       }))
       .catch(() => ({ ...mockRecommendation, id: Number(id) || mockRecommendation.id }))
+  },
+  identifyHerb(file: File) {
+    const formData = new FormData()
+    formData.append('file', file)
+    return http.post<HerbIdentifyResponse>('/herb/identify', formData).then((res) => res.data)
+  },
+  herbRecords() {
+    return http.get<HerbIdentifyRecordResponse[]>('/herb/records').then((res) => res.data)
+  },
+  herbRecordDetail(id: number) {
+    return http.get<HerbIdentifyDetailResponse>(`/herb/records/${id}`).then((res) => res.data)
   },
 }

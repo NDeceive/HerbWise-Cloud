@@ -84,3 +84,20 @@ export interface RecommendationResult {
   teaPairings: Recipe[]
   createdAt: string
 }
+
+export interface HerbIdentifyResponse {
+  id?: number
+  imageName?: string
+  herbName: string
+  confidenceLevel: string
+  appearanceFeatures: string[]
+  effects: string[]
+  suitablePeople: string[]
+  warnings: string[]
+  recommendedRecipes: string[]
+  createdAt?: string
+}
+
+export type HerbIdentifyRecordResponse = HerbIdentifyResponse
+
+export type HerbIdentifyDetailResponse = HerbIdentifyResponse

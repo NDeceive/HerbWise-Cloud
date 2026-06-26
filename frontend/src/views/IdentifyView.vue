@@ -1,22 +1,14 @@
 <script setup lang="ts">
-import { onBeforeUnmount, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { Camera, Check, Picture, UploadFilled } from '@element-plus/icons-vue'
 import AppShell from '../components/AppShell.vue'
 import ContentImage from '../components/ContentImage.vue'
 import VisualBlock from '../components/VisualBlock.vue'
 import { contentImages } from '../data/imageMap'
+import { api } from '../services/api'
+import type { HerbIdentifyRecordResponse, HerbIdentifyResponse } from '../types'
 
-interface RecognitionResult {
-  herbName: string
-  confidenceLevel: string
-  appearanceFeatures: string[]
-  effects: string[]
-  suitablePeople: string[]
-  warnings: string[]
-  recommendedRecipes: string[]
-}
-
-const mockRecognitionResult: RecognitionResult = {
+const mockRecognitionResult: HerbIdentifyResponse = {
   herbName: '黄芪',
   confidenceLevel: '较高',
   appearanceFeatures: [
@@ -34,48 +26,95 @@ const mockRecognitionResult: RecognitionResult = {
   recommendedRecipes: ['当归黄芪乌鸡汤', '黄芪党参乌鸡汤'],
 }
 
-const historyRecords = [
-  { herbName: '黄芪', effect: '补气固表', confidenceLevel: '较高' },
-  { herbName: '陈皮', effect: '理气健脾', confidenceLevel: '中等' },
-  { herbName: '枸杞', effect: '滋补肝肾', confidenceLevel: '较高' },
+const mockHistoryRecords: HerbIdentifyRecordResponse[] = [
+  mockRecognitionResult,
+  {
+    herbName: '陈皮',
+    confidenceLevel: '中等',
+    appearanceFeatures: ['外皮呈橙黄色至棕褐色', '质地较薄，表面有细密油点', '气味芳香，边缘自然卷曲'],
+    effects: ['理气健脾'],
+    suitablePeople: ['脾胃气滞人群', '食欲不佳人群'],
+    warnings: ['阴虚燥咳人群慎用', '不建议长期大量自行食用'],
+    recommendedRecipes: ['陈皮山楂茶', '陈皮莲子粥'],
+  },
+  {
+    herbName: '枸杞',
+    confidenceLevel: '较高',
+    appearanceFeatures: ['果实呈红色或暗红色', '表面略有皱缩纹理', '颗粒较小，质地柔润'],
+    effects: ['滋补肝肾'],
+    suitablePeople: ['用眼较多人群', '日常温和调理人群'],
+    warnings: ['感冒发热期间不建议自行食用', '湿热偏重人群慎用'],
+    recommendedRecipes: ['枸杞红枣茶', '枸杞银耳羹'],
+  },
 ]
 
+const selectedFile = ref<File | null>(null)
 const selectedFileName = ref('')
 const previewUrl = ref('')
 const identifying = ref(false)
-const result = ref<RecognitionResult | null>(null)
-let identifyingTimer: number | undefined
+const result = ref<HerbIdentifyResponse | null>(null)
+const historyRecords = ref<HerbIdentifyRecordResponse[]>(mockHistoryRecords)
 
 function handleFile(event: Event) {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
   if (!file) return
 
+  selectedFile.value = file
   selectedFileName.value = file.name
   result.value = null
   identifying.value = false
-  if (identifyingTimer) window.clearTimeout(identifyingTimer)
 
   if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
   previewUrl.value = URL.createObjectURL(file)
 }
 
-function startRecognition() {
-  if (!selectedFileName.value || identifying.value) return
+async function startRecognition() {
+  if (!selectedFile.value || identifying.value) return
 
   identifying.value = true
   result.value = null
 
-  if (identifyingTimer) window.clearTimeout(identifyingTimer)
-  identifyingTimer = window.setTimeout(() => {
+  try {
+    const response = await api.identifyHerb(selectedFile.value)
+    result.value = response
+    await loadHistoryRecords()
+  } catch {
     result.value = mockRecognitionResult
+  } finally {
     identifying.value = false
-  }, 900)
+  }
 }
+
+async function loadHistoryRecords() {
+  try {
+    historyRecords.value = await api.herbRecords()
+  } catch {
+    historyRecords.value = mockHistoryRecords
+  }
+}
+
+async function showRecord(record: HerbIdentifyRecordResponse) {
+  if (!record.id) {
+    result.value = record
+    return
+  }
+
+  try {
+    result.value = await api.herbRecordDetail(record.id)
+  } catch {
+    result.value = record
+  }
+}
+
+function recordEffect(record: HerbIdentifyRecordResponse) {
+  return record.effects[0] || '辅助识别'
+}
+
+onMounted(loadHistoryRecords)
 
 onBeforeUnmount(() => {
   if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
-  if (identifyingTimer) window.clearTimeout(identifyingTimer)
 })
 </script>
 
@@ -212,9 +251,9 @@ onBeforeUnmount(() => {
               <h2>最近识别记录</h2>
             </div>
             <div class="history-list">
-              <article v-for="record in historyRecords" :key="record.herbName" class="history-item">
+              <article v-for="record in historyRecords" :key="record.id || record.herbName" class="history-item" @click="showRecord(record)">
                 <strong>{{ record.herbName }}</strong>
-                <span>{{ record.effect }}</span>
+                <span>{{ recordEffect(record) }}</span>
                 <small>{{ record.confidenceLevel }}</small>
               </article>
             </div>
