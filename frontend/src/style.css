@@ -1454,6 +1454,29 @@ p,
   color: var(--color-muted);
 }
 
+.identify-image-preview {
+  width: min(100%, 360px);
+  aspect-ratio: 4 / 3;
+  display: block;
+  overflow: hidden;
+  border: 1px solid rgba(181, 138, 90, 0.18);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--shadow-soft);
+}
+
+.identify-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.identify-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;
+}
+
 .identify-preview-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1483,6 +1506,185 @@ p,
 .identify-preview-card p {
   margin: 8px 0 0;
   color: var(--color-body);
+}
+
+.identify-result-card {
+  overflow: hidden;
+}
+
+.confidence-pill {
+  min-width: 92px;
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 13px;
+  border-radius: 999px;
+  color: var(--color-green);
+  background: var(--color-light-green);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.result-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 16px;
+  align-items: end;
+  margin-bottom: 18px;
+  padding: 18px 20px;
+  border: 1px solid rgba(181, 138, 90, 0.14);
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(232, 240, 227, 0.78), rgba(255, 248, 235, 0.84)),
+    var(--color-card);
+}
+
+.result-summary span,
+.result-summary small {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.result-summary span {
+  grid-column: 1;
+}
+
+.result-summary strong {
+  grid-column: 1;
+  color: var(--color-green-dark);
+  font-family: var(--font-title);
+  font-size: 34px;
+  font-weight: 500;
+  letter-spacing: 2px;
+}
+
+.result-summary small {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.82);
+}
+
+.identify-result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.identify-result-grid article {
+  min-height: 150px;
+  padding: 18px;
+  border: 1px solid rgba(181, 138, 90, 0.12);
+  border-radius: 16px;
+  background: rgba(255, 253, 248, 0.72);
+}
+
+.identify-result-grid h3,
+.recipe-recommend-block h3 {
+  margin: 0 0 12px;
+  color: var(--color-green-dark);
+  font-size: 18px;
+}
+
+.identify-result-grid ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+  color: var(--color-body);
+}
+
+.result-tags,
+.recipe-recommend-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.result-tags span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  color: var(--color-green-dark);
+  background: rgba(232, 240, 227, 0.78);
+  font-size: 14px;
+}
+
+.identify-result-grid .warning-result {
+  background: #fff8eb;
+}
+
+.recipe-recommend-block {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(181, 138, 90, 0.14);
+}
+
+.recipe-recommend-card {
+  min-width: min(230px, 100%);
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid rgba(181, 138, 90, 0.14);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fffdf8, #fbf2e7);
+  box-shadow: var(--shadow-soft);
+}
+
+.recipe-recommend-card span {
+  color: var(--color-green-dark);
+  font-weight: 600;
+}
+
+.recipe-recommend-card small {
+  color: var(--color-brown);
+}
+
+.history-list {
+  display: grid;
+  gap: 10px;
+}
+
+.history-item {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) 42px;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(232, 240, 227, 0.58);
+}
+
+.history-item strong {
+  color: var(--color-green-dark);
+}
+
+.history-item span {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-body);
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-item small {
+  justify-self: end;
+  color: var(--color-brown);
+  font-weight: 600;
+}
+
+.identify-disclaimer {
+  margin: 0;
+  color: var(--color-body);
+  font-size: 14px;
+  line-height: 1.75;
 }
 
 .ai-entry-hero {
@@ -2455,7 +2657,9 @@ p,
   .warning-grid,
   .selling-points,
   .profile-steps,
-  .category-grid {
+  .category-grid,
+  .identify-preview-grid,
+  .identify-result-grid {
     grid-template-columns: 1fr;
   }
 

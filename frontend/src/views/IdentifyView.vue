@@ -1,17 +1,82 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Camera, Picture, UploadFilled } from '@element-plus/icons-vue'
+import { onBeforeUnmount, ref } from 'vue'
+import { Camera, Check, Picture, UploadFilled } from '@element-plus/icons-vue'
 import AppShell from '../components/AppShell.vue'
 import ContentImage from '../components/ContentImage.vue'
 import VisualBlock from '../components/VisualBlock.vue'
 import { contentImages } from '../data/imageMap'
 
-const selectedFile = ref('')
+interface RecognitionResult {
+  herbName: string
+  confidenceLevel: string
+  appearanceFeatures: string[]
+  effects: string[]
+  suitablePeople: string[]
+  warnings: string[]
+  recommendedRecipes: string[]
+}
+
+const mockRecognitionResult: RecognitionResult = {
+  herbName: '黄芪',
+  confidenceLevel: '较高',
+  appearanceFeatures: [
+    '切片呈淡黄色至黄白色',
+    '表面可见细密放射状纹理',
+    '质地较轻，边缘略不规则',
+  ],
+  effects: ['补气固表', '健脾益气', '利水消肿'],
+  suitablePeople: ['气虚乏力人群', '易疲劳人群', '脾胃虚弱人群'],
+  warnings: [
+    '实热体质慎用',
+    '感冒发热期间不建议自行食用',
+    '慢性病或正在服药人群请咨询专业医师',
+  ],
+  recommendedRecipes: ['当归黄芪乌鸡汤', '黄芪党参乌鸡汤'],
+}
+
+const historyRecords = [
+  { herbName: '黄芪', effect: '补气固表', confidenceLevel: '较高' },
+  { herbName: '陈皮', effect: '理气健脾', confidenceLevel: '中等' },
+  { herbName: '枸杞', effect: '滋补肝肾', confidenceLevel: '较高' },
+]
+
+const selectedFileName = ref('')
+const previewUrl = ref('')
+const identifying = ref(false)
+const result = ref<RecognitionResult | null>(null)
+let identifyingTimer: number | undefined
 
 function handleFile(event: Event) {
   const input = event.target as HTMLInputElement
-  selectedFile.value = input.files?.[0]?.name || ''
+  const file = input.files?.[0]
+  if (!file) return
+
+  selectedFileName.value = file.name
+  result.value = null
+  identifying.value = false
+  if (identifyingTimer) window.clearTimeout(identifyingTimer)
+
+  if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
+  previewUrl.value = URL.createObjectURL(file)
 }
+
+function startRecognition() {
+  if (!selectedFileName.value || identifying.value) return
+
+  identifying.value = true
+  result.value = null
+
+  if (identifyingTimer) window.clearTimeout(identifyingTimer)
+  identifyingTimer = window.setTimeout(() => {
+    result.value = mockRecognitionResult
+    identifying.value = false
+  }, 900)
+}
+
+onBeforeUnmount(() => {
+  if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
+  if (identifyingTimer) window.clearTimeout(identifyingTimer)
+})
 </script>
 
 <template>
@@ -41,15 +106,24 @@ function handleFile(event: Event) {
             </div>
             <label class="identify-dropzone">
               <input type="file" accept="image/*" @change="handleFile" />
-              <span class="identify-upload-icon">
+              <span v-if="!previewUrl" class="identify-upload-icon">
                 <el-icon><UploadFilled /></el-icon>
               </span>
-              <strong>{{ selectedFile || '选择或拖拽药材图片' }}</strong>
-              <small>建议上传清晰、无文字遮挡的中药材或食材图片</small>
+              <span v-else class="identify-image-preview">
+                <img :src="previewUrl" :alt="selectedFileName" />
+              </span>
+              <strong>{{ selectedFileName || '选择或拖拽药材图片' }}</strong>
+              <small>{{ previewUrl ? '已生成本地预览，可开始识别' : '建议上传清晰、无文字遮挡的中药材或食材图片' }}</small>
             </label>
+            <div class="identify-actions">
+              <button class="primary-btn big-btn" type="button" :disabled="!selectedFileName || identifying" @click="startRecognition">
+                <el-icon><Camera /></el-icon>
+                {{ identifying ? '识别中...' : '开始识别' }}
+              </button>
+            </div>
           </section>
 
-          <section class="section-card">
+          <section v-if="!result" class="section-card">
             <div class="section-head">
               <div>
                 <h2 class="section-title">识别结果预览</h2>
@@ -69,18 +143,90 @@ function handleFile(event: Event) {
               </article>
             </div>
           </section>
+
+          <section v-else class="section-card identify-result-card">
+            <div class="section-head">
+              <div>
+                <h2 class="section-title">识别结果</h2>
+                <p class="muted">以下为前端演示用模拟结果，用于展示药材识别后的信息组织方式。</p>
+              </div>
+              <span class="confidence-pill">
+                <el-icon><Check /></el-icon>
+                {{ result.confidenceLevel }}
+              </span>
+            </div>
+
+            <div class="result-summary">
+              <span>药材名称</span>
+              <strong>{{ result.herbName }}</strong>
+              <small>识别置信度：{{ result.confidenceLevel }}</small>
+            </div>
+
+            <div class="identify-result-grid">
+              <article>
+                <h3>外观特征</h3>
+                <ul>
+                  <li v-for="item in result.appearanceFeatures" :key="item">{{ item }}</li>
+                </ul>
+              </article>
+              <article>
+                <h3>主要功效</h3>
+                <div class="result-tags">
+                  <span v-for="item in result.effects" :key="item">{{ item }}</span>
+                </div>
+              </article>
+              <article>
+                <h3>适用人群</h3>
+                <div class="result-tags">
+                  <span v-for="item in result.suitablePeople" :key="item">{{ item }}</span>
+                </div>
+              </article>
+              <article class="warning-result">
+                <h3>注意事项</h3>
+                <ul>
+                  <li v-for="item in result.warnings" :key="item">{{ item }}</li>
+                </ul>
+              </article>
+            </div>
+
+            <div class="recipe-recommend-block">
+              <h3>相关推荐药膳</h3>
+              <div class="recipe-recommend-list">
+                <RouterLink
+                  v-for="recipe in result.recommendedRecipes"
+                  :key="recipe"
+                  class="recipe-recommend-card"
+                  to="/plans?category=补气养血"
+                >
+                  <span>{{ recipe }}</span>
+                  <small>查看补气养血方案</small>
+                </RouterLink>
+              </div>
+            </div>
+          </section>
         </div>
 
         <aside class="side-stack">
+          <section class="side-card history-card">
+            <div class="side-title">
+              <h2>最近识别记录</h2>
+            </div>
+            <div class="history-list">
+              <article v-for="record in historyRecords" :key="record.herbName" class="history-item">
+                <strong>{{ record.herbName }}</strong>
+                <span>{{ record.effect }}</span>
+                <small>{{ record.confidenceLevel }}</small>
+              </article>
+            </div>
+          </section>
+
           <section class="side-card safety-card">
             <div class="side-title">
-              <h2>使用提示</h2>
+              <h2>安全提示</h2>
             </div>
-            <ul class="safety-list">
-              <li>识别结果仅作草本知识参考。</li>
-              <li>不确定药材来源时，请勿自行煎服。</li>
-              <li>涉及疾病、用药或特殊体质，请咨询专业医师。</li>
-            </ul>
+            <p class="identify-disclaimer">
+              AI 药材识别结果仅供健康管理、学习和辅助参考，不能替代专业药师鉴定、医疗诊断或用药建议。如涉及疾病治疗、孕期、慢性病、过敏体质或正在服药，请咨询专业医师。
+            </p>
           </section>
         </aside>
       </div>
