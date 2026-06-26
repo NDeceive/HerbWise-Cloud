@@ -86,7 +86,7 @@ onBeforeUnmount(() => {
         <div class="listing-copy">
           <div class="eyebrow">AI 药材识别</div>
           <h1 class="page-title">上传药材图片，辅助识别草本信息</h1>
-          <p>用于比赛原型展示的前端识别入口，可承接后续药材图像识别能力。</p>
+          <p>支持上传中药材与药食同源食材图片，辅助识别药材名称、外观特征、功效信息与安全用膳提示。</p>
         </div>
         <div class="listing-hero-image">
           <ContentImage :src="contentImages.herbBasket" alt="中式草本药材与食疗食材" image-class="banner-real-image visual-img">
@@ -101,7 +101,7 @@ onBeforeUnmount(() => {
             <div class="section-head">
               <div>
                 <h2 class="section-title">图片上传</h2>
-                <p class="muted">支持上传单张药材图片，当前前端保留识别入口与结果展示区域，不新增后端接口。</p>
+                <p class="muted">支持上传单张药材图片，系统将结合图像特征展示药材名称、功效说明与食用注意事项。</p>
               </div>
             </div>
             <label class="identify-dropzone">
@@ -148,7 +148,7 @@ onBeforeUnmount(() => {
             <div class="section-head">
               <div>
                 <h2 class="section-title">识别结果</h2>
-                <p class="muted">以下为前端演示用模拟结果，用于展示药材识别后的信息组织方式。</p>
+                <p class="muted">系统根据图片特征生成识别结果，并结合药食同源知识给出功效说明、注意事项与相关推荐。</p>
               </div>
               <span class="confidence-pill">
                 <el-icon><Check /></el-icon>
